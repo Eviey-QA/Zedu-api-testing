@@ -490,11 +490,6 @@ describe("Login - All Empty Fields", () => {
         {},
         { validateStatus: () => true }
     );
-
-    console.log("\n--- Login Empty Fields Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-----------------------------------\n");
   });
 
   //Status code
@@ -556,11 +551,6 @@ describe("Fetch onboard-status - Valid Token", () => {
      headers: authHeaders(token),
       validateStatus: () => true,
     });
-
-    console.log("\n--- Onboard Status Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-------------------------------\n");
   });
 
   //Status code
