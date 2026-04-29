@@ -1,0 +1,25 @@
+{
+  "name": "zedu-api-tests-js",
+  "version": "1.0.0",
+  "description": "JavaScript API test suite for the Zedu staging platform",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:verbose": "vitest run --reporter=verbose",
+    "test:auth": "vitest run tests/auth.test.js",
+    "test:users": "vitest run tests/users.test.js",
+    "test:roles": "vitest run tests/roles.test.js",
+    "test:report": "vitest run --reporter=json --outputFile=reports/results.json"
+  },
+  "dependencies": {
+    "@faker-js/faker": "9.4.0",
+    "axios": "1.7.9",
+    "dotenv": "16.4.7"
+  },
+  "devDependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "vitest": "^4.1.5"
+  }
+}
