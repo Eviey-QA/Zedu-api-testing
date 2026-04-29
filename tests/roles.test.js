@@ -262,8 +262,6 @@ describe("Create organisation role - Two-Character Name Field", () => {
                 validateStatus: () => true,
             }
         );
-
-        console.log(res.data);
     });
 
     //status code
