@@ -36,11 +36,6 @@ describe("Update user status - Invalid Emoji", () => {
           validateStatus: () => true,
         }
     );
-
-    console.log("\n--- Invalid Emoji Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("------------------------------\n");
   });
 
   //Status code
