@@ -424,7 +424,7 @@ describe("Create organisation role - Long Description Field", () => {
     });
 });
 
-describe.skip("Create organisation role - Numeric Name Field", () => {
+describe("Create organisation role - Numeric Name Field", () => {
     let res;
     let roleName;
     let roleDescription;
