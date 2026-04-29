@@ -26,7 +26,7 @@ import { faker } from "@faker-js/faker";
 import { getBaseUrl, registerUser, loginUser, authHeaders, expiredTokenHeaders, malformedTokenHeaders, noAuthHeaders } from "../utils/auth.js";
 import { validate, validateLoginBody, hasErrorMessage, getErrorMessage, extractProfile } from "../utils/schemas.js";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//Helpers
 
 /** Build a complete, valid registration payload with unique values.
  *  Pass `overrides` to replace a field or set it to `undefined` to remove it. */
