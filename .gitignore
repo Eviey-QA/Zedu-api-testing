@@ -7,3 +7,6 @@ node_modules/
 # generated output
 coverage/
 reports/
+
+.junie
+.idea
