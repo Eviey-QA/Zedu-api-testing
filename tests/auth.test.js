@@ -1,43 +1,33 @@
-/**
- * tests/auth.test.js
- * ------------------
- * Tests for /auth/register and /auth/login.
- *
- * Registration payload: username, email, password, first_name, last_name, phone_number
- * Login payload: email, password
- *
- * Every test validates ALL SIX mandatory categories:
- *   1. Status code
- *   2. Field presence
- *   3. Data types
- *   4. Field values
- *   5. Error messages
- *   6. Schema validation
- *
- * Independence guarantee
- * ----------------------
- * Every test that needs a live account calls registerUser() itself.
- * No test depends on another having run first.
- */
-
 import "dotenv/config";
 import axios from "axios";
 import { faker } from "@faker-js/faker";
-import { getBaseUrl, registerUser, loginUser, authHeaders, expiredTokenHeaders, malformedTokenHeaders, noAuthHeaders } from "../utils/auth.js";
-import { validate, validateLoginBody, hasErrorMessage, getErrorMessage, extractProfile } from "../utils/schemas.js";
+import {
+  getBaseUrl,
+  registerUser,
+  loginUser,
+  authHeaders,
+  expiredTokenHeaders,
+  malformedTokenHeaders,
+  noAuthHeaders,
+} from "../utils/auth.js";
+import {
+  validate,
+  validateLoginBody,
+  hasErrorMessage,
+  getErrorMessage,
+  extractProfile,
+} from "../utils/schemas.js";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//helpers
 
-/** Build a complete, valid registration payload with unique values.
- *  Pass `overrides` to replace a field or set it to `undefined` to remove it. */
 function validPayload(overrides = {}) {
   const p = {
-    username:     faker.internet.username(),
-    email:        faker.internet.email().toLowerCase(),
-    password:     "Str0ng@Pass1!",
-    first_name:   faker.person.firstName(),
-    last_name:    faker.person.lastName(),
-    phone_number: '+234' + faker.string.numeric(10),
+    username: faker.internet.username(),
+    email: faker.internet.email().toLowerCase(),
+    password: "Str0ng@Pass1!",
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    phone_number: "+234" + faker.string.numeric(10),
   };
   for (const [k, v] of Object.entries(overrides)) {
     if (v === undefined) delete p[k];
@@ -56,7 +46,7 @@ async function postLogin(email, password) {
   return axios.post(
     `${getBaseUrl()}/auth/login`,
     { email, password },
-    { validateStatus: () => true }
+    { validateStatus: () => true },
   );
 }
 
@@ -127,7 +117,6 @@ describe("Registration - Valid Data", () => {
     const user = res.data.data.user;
     expect(res.data.status).toBe("success");
     expect(user.email).toBe(payload.email);
-
   });
 
   //No error messages on success
@@ -192,8 +181,12 @@ describe("Registration - All Empty Fields", () => {
   //Error messages content
   test("error object contains the correct validation messages for each missing field", () => {
     const errors = res.data.error;
-    expect(errors["CreateUserRequestModel.email"]).toBe("email is a required field");
-    expect(errors["CreateUserRequestModel.password"]).toBe("password is a required field");
+    expect(errors["CreateUserRequestModel.email"]).toBe(
+      "email is a required field",
+    );
+    expect(errors["CreateUserRequestModel.password"]).toBe(
+      "password is a required field",
+    );
   });
 
   //Schema validation
@@ -214,18 +207,18 @@ describe("Registration - Duplicate Email/PhoneNumber", () => {
     await registerUser({ email: duplicateEmail, phoneNumber });
 
     res = await axios.post(
-        `${getBaseUrl()}/auth/register`,
-        {
-          username: faker.internet.username(),
-          email: duplicateEmail,
-          password: "Str0ng@Pass1!",
-          first_name: faker.person.firstName(),
-          last_name: faker.person.lastName(),
-          phone_number: phoneNumber,
-        },
-        {
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/register`,
+      {
+        username: faker.internet.username(),
+        email: duplicateEmail,
+        password: "Str0ng@Pass1!",
+        first_name: faker.person.firstName(),
+        last_name: faker.person.lastName(),
+        phone_number: phoneNumber,
+      },
+      {
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -248,13 +241,14 @@ describe("Registration - Duplicate Email/PhoneNumber", () => {
   test("response body contains duplicate email/phoneNumber error values", () => {
     expect(res.data.status).toBe("error");
     expect(res.data.status_code).toBe(400);
-    expect(res.data.message.toLowerCase()).toContain("user already exists with the given phone");
+    expect(res.data.message.toLowerCase()).toContain(
+      "user already exists with the given phone",
+    );
   });
 
   test("response contains an error message", () => {
     expect(res.data.message.trim().length).toBeGreaterThan(0);
   });
-
 });
 
 describe("Registration - Password Containing Special Character", () => {
@@ -271,13 +265,9 @@ describe("Registration - Password Containing Special Character", () => {
       phone_number: "+234" + faker.string.numeric(10),
     };
 
-    res = await axios.post(
-        `${getBaseUrl()}/auth/register`,
-        payload,
-        {
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.post(`${getBaseUrl()}/auth/register`, payload, {
+      validateStatus: () => true,
+    });
   });
 
   test("returns 201 status code", () => {
@@ -383,11 +373,6 @@ describe("Login - Incorrect Password", () => {
     // Register a fresh account then attempt login with a wrong password
     const user = await registerUser();
     res = await postLogin(user.email, "WrongPassword!!99");
-
-    console.log("\n--- Incorrect Password Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-----------------------------------\n");
   });
 
   //Status code
@@ -434,11 +419,6 @@ describe("Login - Incorrect Email", () => {
 
   beforeAll(async () => {
     res = await postLogin("nonexistent_user_xyz@zedu-test.io", "Str0ng@Pass1!");
-
-    console.log("\n--- Incorrect Email Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("--------------------------------\n");
   });
 
   //Status code
@@ -486,15 +466,10 @@ describe("Login - All Empty Fields", () => {
 
   beforeAll(async () => {
     res = await axios.post(
-        `${getBaseUrl()}/auth/login`,
-        {},
-        { validateStatus: () => true }
+      `${getBaseUrl()}/auth/login`,
+      {},
+      { validateStatus: () => true },
     );
-
-    console.log("\n--- Login Empty Fields Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-----------------------------------\n");
   });
 
   //Status code
@@ -535,7 +510,9 @@ describe("Login - All Empty Fields", () => {
   test("error object contains the correct validation messages for each missing field", () => {
     const errors = res.data.error;
     expect(errors["LoginRequestModel.email"]).toBe("email is a required field");
-    expect(errors["LoginRequestModel.password"]).toBe("password is a required field");
+    expect(errors["LoginRequestModel.password"]).toBe(
+      "password is a required field",
+    );
   });
 
   //Schema validation
@@ -553,14 +530,9 @@ describe("Fetch onboard-status - Valid Token", () => {
     const { token } = registeredUser;
 
     res = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
-     headers: authHeaders(token),
+      headers: authHeaders(token),
       validateStatus: () => true,
     });
-
-    console.log("\n--- Onboard Status Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-------------------------------\n");
   });
 
   //Status code
@@ -607,10 +579,9 @@ describe("Fetch onboard-status - Valid Token", () => {
   });
 });
 
-
 describe("Fetch onboard-status - Malformed Token", () => {
   test("returns 401 with Token is invalid message", async () => {
-    const res  = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
+    const res = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
       headers: malformedTokenHeaders(),
       validateStatus: () => true,
     });
@@ -646,7 +617,7 @@ describe("Fetch onboard-status - Malformed Token", () => {
 
 describe("Fetch onboard-status - Expired Token", () => {
   test("returns 401 with Token is invalid message", async () => {
-    const res  = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
+    const res = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
       headers: expiredTokenHeaders(),
       validateStatus: () => true,
     });
@@ -682,7 +653,7 @@ describe("Fetch onboard-status - Expired Token", () => {
 
 describe("Fetch onboard-status - No Token", () => {
   test("returns 401 with Token could not be found message", async () => {
-    const res  = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
+    const res = await axios.get(`${getBaseUrl()}/auth/onboard-status`, {
       headers: noAuthHeaders(),
       validateStatus: () => true,
     });
@@ -728,15 +699,15 @@ describe("Change password - Valid Inputs", () => {
     const token = session.token;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: oldPassword,
-          new_password: newPassword,
-        },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: oldPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -848,15 +819,15 @@ describe("Change password - Invalid Old Password", () => {
     const token = session.token;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: wrongOldPassword,
-          new_password: newPassword,
-        },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: wrongOldPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -908,15 +879,15 @@ describe("Change password - Old And New Password Are The Same", () => {
     const token = session.token;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: password,
-          new_password: password,
-        },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: password,
+        new_password: password,
+      },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -968,15 +939,15 @@ describe("Change password - New Password Is One Character", () => {
     const token = session.token;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: oldPassword,
-          new_password: "1",
-        },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: oldPassword,
+        new_password: "1",
+      },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -989,7 +960,9 @@ describe("Change password - New Password Is One Character", () => {
     expect(res.data).toHaveProperty("status_code");
     expect(res.data).toHaveProperty("message");
     expect(res.data).toHaveProperty("error");
-    expect(res.data.error).toHaveProperty("ChangePasswordRequestModel.new_password");
+    expect(res.data.error).toHaveProperty(
+      "ChangePasswordRequestModel.new_password",
+    );
   });
 
   test("response fields have correct data types", () => {
@@ -997,7 +970,9 @@ describe("Change password - New Password Is One Character", () => {
     expect(typeof res.data.status_code).toBe("number");
     expect(typeof res.data.message).toBe("string");
     expect(typeof res.data.error).toBe("object");
-    expect(typeof res.data.error["ChangePasswordRequestModel.new_password"]).toBe("string");
+    expect(
+      typeof res.data.error["ChangePasswordRequestModel.new_password"],
+    ).toBe("string");
   });
 
   test("response body matches exact one-character new-password validation response", () => {
@@ -1006,7 +981,8 @@ describe("Change password - New Password Is One Character", () => {
       status_code: 422,
       message: "Validation failed",
       error: {
-        "ChangePasswordRequestModel.new_password": "new_password must be at least 7 characters in length",
+        "ChangePasswordRequestModel.new_password":
+          "new_password must be at least 7 characters in length",
       },
     });
   });
@@ -1032,15 +1008,15 @@ describe("Change password - Empty New Password Field", () => {
     const token = session.token;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: oldPassword,
-          new_password: "",
-        },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: oldPassword,
+        new_password: "",
+      },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -1053,7 +1029,9 @@ describe("Change password - Empty New Password Field", () => {
     expect(res.data).toHaveProperty("status_code");
     expect(res.data).toHaveProperty("message");
     expect(res.data).toHaveProperty("error");
-    expect(res.data.error).toHaveProperty("ChangePasswordRequestModel.new_password");
+    expect(res.data.error).toHaveProperty(
+      "ChangePasswordRequestModel.new_password",
+    );
   });
 
   test("response fields have correct data types", () => {
@@ -1061,7 +1039,9 @@ describe("Change password - Empty New Password Field", () => {
     expect(typeof res.data.status_code).toBe("number");
     expect(typeof res.data.message).toBe("string");
     expect(typeof res.data.error).toBe("object");
-    expect(typeof res.data.error["ChangePasswordRequestModel.new_password"]).toBe("string");
+    expect(
+      typeof res.data.error["ChangePasswordRequestModel.new_password"],
+    ).toBe("string");
   });
 
   test("response body matches exact empty-new-password validation response", () => {
@@ -1070,7 +1050,8 @@ describe("Change password - Empty New Password Field", () => {
       status_code: 422,
       message: "Validation failed",
       error: {
-        "ChangePasswordRequestModel.new_password": "new_password is a required field",
+        "ChangePasswordRequestModel.new_password":
+          "new_password is a required field",
       },
     });
   });
@@ -1094,15 +1075,15 @@ describe("Change password - Without Access Token", () => {
     newPassword = `New@Pass${faker.string.numeric(6)}!`;
 
     res = await axios.put(
-        `${getBaseUrl()}/auth/change-password`,
-        {
-          old_password: oldPassword,
-          new_password: newPassword,
-        },
-        {
-          headers: noAuthHeaders(),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/change-password`,
+      {
+        old_password: oldPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: noAuthHeaders(),
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -1116,7 +1097,9 @@ describe("Change password - Without Access Token", () => {
 
   test("response error message is not empty", () => {
     const msg = getErrorMessage(res.data);
-    expect(typeof msg === "string" || Array.isArray(msg) || typeof msg === "object").toBe(true);
+    expect(
+      typeof msg === "string" || Array.isArray(msg) || typeof msg === "object",
+    ).toBe(true);
 
     if (typeof msg === "string") {
       expect(msg.trim().length).toBeGreaterThan(0);
@@ -1142,15 +1125,15 @@ describe("Logout - Without Access Token", () => {
 
   beforeAll(async () => {
     res = await axios.post(
-        `${getBaseUrl()}/auth/logout`,
-        {},
-        {
-          headers: {
-            Authorization: "Bearer ",
-            "Content-Type": "application/json",
-          },
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/logout`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer ",
+          "Content-Type": "application/json",
+        },
+        validateStatus: () => true,
+      },
     );
   });
 
@@ -1165,7 +1148,9 @@ describe("Logout - Without Access Token", () => {
   test("response error message is not empty", () => {
     const msg = getErrorMessage(res.data);
 
-    expect(typeof msg === "string" || Array.isArray(msg) || typeof msg === "object").toBe(true);
+    expect(
+      typeof msg === "string" || Array.isArray(msg) || typeof msg === "object",
+    ).toBe(true);
 
     if (typeof msg === "string") {
       expect(msg.trim().length).toBeGreaterThan(0);
@@ -1191,16 +1176,19 @@ describe("Logout - Valid Inputs", () => {
 
   beforeAll(async () => {
     const registeredUser = await registerUser();
-    const session = await loginUser(registeredUser.email, registeredUser.password);
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
     const token = session.token;
 
     res = await axios.post(
-        `${getBaseUrl()}/auth/logout`,
-        {},
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/auth/logout`,
+      {},
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
   });
 

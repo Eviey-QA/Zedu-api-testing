@@ -1,41 +1,33 @@
-/**
- * utils/schemas.js
- */
-
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 
-// ---------------------------------------------------------------------------
-// Schema definitions
-// ---------------------------------------------------------------------------
-
 // Top-level envelope: { status, status_code, message, data: { access_token, user } }
 const REGISTER_SUCCESS_SCHEMA = {
   type: "object",
   required: ["status", "status_code", "message", "data"],
   properties: {
-    status:      { type: "string" },
+    status: { type: "string" },
     status_code: { type: "integer" },
-    message:     { type: "string" },
+    message: { type: "string" },
     data: {
       type: "object",
       required: ["access_token", "user"],
       properties: {
-        access_token:       { type: "string", minLength: 20 },
+        access_token: { type: "string", minLength: 20 },
         notification_token: { type: "string" },
         user: {
           type: "object",
           required: ["id", "email"],
           properties: {
-            id:         { type: "string" },
-            email:      { type: "string", format: "email" },
-            username:   { type: "string" },
+            id: { type: "string" },
+            email: { type: "string", format: "email" },
+            username: { type: "string" },
             first_name: { type: "string" },
-            last_name:  { type: "string" },
-            phone:      { type: "string" },
+            last_name: { type: "string" },
+            phone: { type: "string" },
           },
           additionalProperties: true,
         },
@@ -51,9 +43,9 @@ const LOGIN_SUCCESS_SCHEMA = {
   type: "object",
   required: ["status", "status_code", "message", "data"],
   properties: {
-    status:      { type: "string" },
+    status: { type: "string" },
     status_code: { type: "integer" },
-    message:     { type: "string" },
+    message: { type: "string" },
     data: {
       type: "object",
       required: ["access_token"],
@@ -71,14 +63,14 @@ const USER_PROFILE_SCHEMA = {
   type: "object",
   required: ["id", "email"],
   properties: {
-    id:         { type: "string" },
-    email:      { type: "string", format: "email" },
-    username:   { type: "string" },
+    id: { type: "string" },
+    email: { type: "string", format: "email" },
+    username: { type: "string" },
     first_name: { type: "string" },
-    last_name:  { type: "string" },
-    phone:      { type: "string" },
-    is_active:  { type: "boolean" },
-    fullname:   { type: "string" },
+    last_name: { type: "string" },
+    phone: { type: "string" },
+    is_active: { type: "boolean" },
+    fullname: { type: "string" },
   },
   additionalProperties: true,
 };
@@ -93,9 +85,9 @@ const ONBOARD_STATUS_SCHEMA = {
   type: "object",
   required: ["status", "status_code", "message", "data"],
   properties: {
-    status:      { type: "string" },
+    status: { type: "string" },
     status_code: { type: "integer" },
-    message:     { type: "string" },
+    message: { type: "string" },
     data: {
       type: "object",
       required: ["online", "status"],
@@ -111,10 +103,10 @@ const ONBOARD_STATUS_SCHEMA = {
 
 const validators = {
   registerSuccess: ajv.compile(REGISTER_SUCCESS_SCHEMA),
-  loginSuccess:    ajv.compile(LOGIN_SUCCESS_SCHEMA),
-  userProfile:     ajv.compile(USER_PROFILE_SCHEMA),
-  errorResponse:   ajv.compile(ERROR_RESPONSE_SCHEMA),
-  onboardStatus:   ajv.compile(ONBOARD_STATUS_SCHEMA),
+  loginSuccess: ajv.compile(LOGIN_SUCCESS_SCHEMA),
+  userProfile: ajv.compile(USER_PROFILE_SCHEMA),
+  errorResponse: ajv.compile(ERROR_RESPONSE_SCHEMA),
+  onboardStatus: ajv.compile(ONBOARD_STATUS_SCHEMA),
 };
 
 function validate(data, schemaName) {
@@ -123,22 +115,27 @@ function validate(data, schemaName) {
 
   const valid = fn(data);
   if (!valid) {
-    const errors = fn.errors.map((e) => `  ${e.instancePath} ${e.message}`).join("\n");
-    throw new Error(`Schema "${schemaName}" validation failed:\n${errors}\nData: ${JSON.stringify(data)}`);
+    const errors = fn.errors
+      .map((e) => `  ${e.instancePath} ${e.message}`)
+      .join("\n");
+    throw new Error(
+      `Schema "${schemaName}" validation failed:\n${errors}\nData: ${JSON.stringify(data)}`,
+    );
   }
 }
 
-/**
- * Validate a login response and return the access token.
- */
+// validate login
 function validateLoginBody(body) {
   validate(body, "loginSuccess");
   const token = body?.data?.access_token ?? null;
-  if (!token) throw new Error(`Token not found after schema validation: ${JSON.stringify(body)}`);
+  if (!token)
+    throw new Error(
+      `Token not found after schema validation: ${JSON.stringify(body)}`,
+    );
   return token;
 }
 
-const ERROR_KEYS = [ "error", "errors", "msg"];
+const ERROR_KEYS = ["error", "errors", "msg"];
 
 function hasErrorMessage(body) {
   return ERROR_KEYS.some((k) => body[k] !== undefined);

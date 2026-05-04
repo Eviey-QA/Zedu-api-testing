@@ -1,22 +1,20 @@
-/**
- * tests/users.test.js
- * Every test validates ALL SIX mandatory categories:
- *   1. Status code
- *   2. Field presence
- *   3. Data types
- *   4. Field values
- *   5. Error messages
- *   6. Schema validation
- * Every test that needs auth registers its own account and logs in.
- * No test shares a state with another.
- */
-
 import "dotenv/config";
 import axios from "axios";
-import { getBaseUrl, registerUser, loginUser, authHeaders, noAuthHeaders, malformedTokenHeaders, expiredTokenHeaders } from "../utils/auth.js";
-import { validate, hasErrorMessage, getErrorMessage } from "../utils/schemas.js";
-import {faker} from "@faker-js/faker";
-
+import {
+  getBaseUrl,
+  registerUser,
+  loginUser,
+  authHeaders,
+  noAuthHeaders,
+  malformedTokenHeaders,
+  expiredTokenHeaders,
+} from "../utils/auth.js";
+import {
+  validate,
+  hasErrorMessage,
+  getErrorMessage,
+} from "../utils/schemas.js";
+import { faker } from "@faker-js/faker";
 
 describe("Update user status - Invalid Emoji", () => {
   let res;
@@ -24,23 +22,21 @@ describe("Update user status - Invalid Emoji", () => {
   beforeAll(async () => {
     // Register a fresh account to get both token and userId
     const registeredUser = await registerUser();
-    const session        = await loginUser(registeredUser.email, registeredUser.password);
-    const token          = session.token;
-    const userId         = registeredUser.userId;
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
+    const token = session.token;
+    const userId = registeredUser.userId;
 
     res = await axios.patch(
-        `${getBaseUrl()}/users/${userId}/status`,
-        { emoji: "not-an-emoji" },
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/users/${userId}/status`,
+      { emoji: "not-an-emoji" },
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
-
-    console.log("\n--- Invalid Emoji Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("------------------------------\n");
   });
 
   //Status code
@@ -88,23 +84,21 @@ describe("Update user status - Empty Fields (Bug)", () => {
 
   beforeAll(async () => {
     const registeredUser = await registerUser();
-    const session        = await loginUser(registeredUser.email, registeredUser.password);
-    const token          = session.token;
-    const userId         = registeredUser.userId;
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
+    const token = session.token;
+    const userId = registeredUser.userId;
 
     res = await axios.patch(
-        `${getBaseUrl()}/users/${userId}/status`,
-        {},
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
+      `${getBaseUrl()}/users/${userId}/status`,
+      {},
+      {
+        headers: authHeaders(token),
+        validateStatus: () => true,
+      },
     );
-
-    console.log("\n--- Empty Fields Response ---");
-    console.log("Status :", res.status);
-    console.log("Body   :", JSON.stringify(res.data, null, 2));
-    console.log("-----------------------------\n");
   });
 
   //Status code: API currently returns 200 but SHOULD return 400/422
@@ -112,7 +106,7 @@ describe("Update user status - Empty Fields (Bug)", () => {
     // This test documents a known API defect.
     // Expected behaviour: 400 or 422 (validation error)
     // Actual behaviour:   200 (silently accepts empty body)
-    expect(res.status).not.toBe(200);        // fails — documents the bug
+    expect(res.status).not.toBe(200); // fails — documents the bug
     expect([400, 422]).toContain(res.status); // what it should return
   });
 
@@ -133,16 +127,16 @@ describe("Retrieve organisation details - Valid Inputs", () => {
 
   beforeAll(async () => {
     registeredUser = await registerUser();
-    const session = await loginUser(registeredUser.email, registeredUser.password);
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
     const token = session.token;
 
-    res = await axios.get(
-        `${getBaseUrl()}/users/organisations/`,
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.get(`${getBaseUrl()}/users/organisations/`, {
+      headers: authHeaders(token),
+      validateStatus: () => true,
+    });
   });
 
   test("returns 200 status code", () => {
@@ -320,16 +314,13 @@ describe("Retrieve organisation details - Without Access Token", () => {
   let res;
 
   beforeAll(async () => {
-    res = await axios.get(
-        `${getBaseUrl()}/users/organisations/`,
-        {
-          headers: {
-            Authorization: "Bearer ",
-            "Content-Type": "application/json",
-          },
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.get(`${getBaseUrl()}/users/organisations/`, {
+      headers: {
+        Authorization: "Bearer ",
+        "Content-Type": "application/json",
+      },
+      validateStatus: () => true,
+    });
   });
 
   test("returns 401 status code", () => {
@@ -343,7 +334,9 @@ describe("Retrieve organisation details - Without Access Token", () => {
   test("response error message is not empty", () => {
     const msg = getErrorMessage(res.data);
 
-    expect(typeof msg === "string" || Array.isArray(msg) || typeof msg === "object").toBe(true);
+    expect(
+      typeof msg === "string" || Array.isArray(msg) || typeof msg === "object",
+    ).toBe(true);
 
     if (typeof msg === "string") {
       expect(msg.trim().length).toBeGreaterThan(0);
@@ -370,17 +363,17 @@ describe("Delete user - Valid Inputs", () => {
 
   beforeAll(async () => {
     const registeredUser = await registerUser();
-    const session = await loginUser(registeredUser.email, registeredUser.password);
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
     const token = session.token;
     userId = registeredUser.userId;
 
-    res = await axios.delete(
-        `${getBaseUrl()}/users/${userId}`,
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.delete(`${getBaseUrl()}/users/${userId}`, {
+      headers: authHeaders(token),
+      validateStatus: () => true,
+    });
   });
 
   test("returns 200 status code", () => {
@@ -421,16 +414,16 @@ describe("Delete user - Invalid User ID", () => {
 
   beforeAll(async () => {
     const registeredUser = await registerUser();
-    const session = await loginUser(registeredUser.email, registeredUser.password);
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
     const token = session.token;
 
-    res = await axios.delete(
-        `${getBaseUrl()}/users/{{user_id`,
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.delete(`${getBaseUrl()}/users/{{user_id`, {
+      headers: authHeaders(token),
+      validateStatus: () => true,
+    });
   });
 
   test("returns 400 status code", () => {
@@ -453,7 +446,8 @@ describe("Delete user - Invalid User ID", () => {
     expect(res.data).toEqual({
       status: "error",
       status_code: 400,
-      message: "user not found: ERROR: invalid input syntax for type uuid: \"{{user_id\" (SQLSTATE 22P02)",
+      message:
+        'user not found: ERROR: invalid input syntax for type uuid: "{{user_id" (SQLSTATE 22P02)',
     });
   });
 
@@ -474,16 +468,13 @@ describe("Delete user - Without Access Token", () => {
     const registeredUser = await registerUser();
     userId = registeredUser.userId;
 
-    res = await axios.delete(
-        `${getBaseUrl()}/users/${userId}`,
-        {
-          headers: {
-            Authorization: "Bearer ",
-            "Content-Type": "application/json",
-          },
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.delete(`${getBaseUrl()}/users/${userId}`, {
+      headers: {
+        Authorization: "Bearer ",
+        "Content-Type": "application/json",
+      },
+      validateStatus: () => true,
+    });
   });
 
   test("returns 401 status code", () => {
@@ -497,7 +488,9 @@ describe("Delete user - Without Access Token", () => {
   test("response error message is not empty", () => {
     const msg = getErrorMessage(res.data);
 
-    expect(typeof msg === "string" || Array.isArray(msg) || typeof msg === "object").toBe(true);
+    expect(
+      typeof msg === "string" || Array.isArray(msg) || typeof msg === "object",
+    ).toBe(true);
 
     if (typeof msg === "string") {
       expect(msg.trim().length).toBeGreaterThan(0);
@@ -524,17 +517,17 @@ describe("Delete user - Wrong Endpoint", () => {
 
   beforeAll(async () => {
     const registeredUser = await registerUser();
-    const session = await loginUser(registeredUser.email, registeredUser.password);
+    const session = await loginUser(
+      registeredUser.email,
+      registeredUser.password,
+    );
     const token = session.token;
     userId = registeredUser.userId;
 
-    res = await axios.delete(
-        `${getBaseUrl()}/user/${userId}`,
-        {
-          headers: authHeaders(token),
-          validateStatus: () => true,
-        }
-    );
+    res = await axios.delete(`${getBaseUrl()}/user/${userId}`, {
+      headers: authHeaders(token),
+      validateStatus: () => true,
+    });
   });
 
   test("returns 404 status code", () => {

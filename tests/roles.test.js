@@ -1,16 +1,3 @@
-/**
- * tests/roles.test.js
- * Every test validates ALL SIX mandatory categories:
- *   1. Status code
- *   2. Field presence
- *   3. Data types
- *   4. Field values
- *   5. Error messages
- *   6. Schema validation
- * Every test that needs auth registers its own account and logs in.
- * No test shares a state with another.
- */
-
 import {authHeaders, getBaseUrl, loginUser, registerUser} from "../utils/auth.js";
 import {faker} from "@faker-js/faker";
 import axios from "axios";
@@ -44,12 +31,6 @@ describe("Create organisation role — Valid Inputs", () => {
             }
         );
 
-        console.log("\n--- Valid Inputs Response ---");
-
-        console.log("\n--- Create Org Role Response ---");
-        console.log("Status :", res.status);
-        console.log("Body   :", JSON.stringify(res.data, null, 2));
-        console.log("--------------------------------\n");
     });
 
     //Status code
@@ -262,8 +243,6 @@ describe("Create organisation role - Two-Character Name Field", () => {
                 validateStatus: () => true,
             }
         );
-
-        console.log(res.data);
     });
 
     //status code
