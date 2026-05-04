@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["**"]
 
+env:
+  APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+
 jobs:
   test:
     name: Run Vitest Tests
