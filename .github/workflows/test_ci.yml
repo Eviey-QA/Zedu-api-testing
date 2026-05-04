@@ -41,7 +41,7 @@ jobs:
       # - "junit" reporter → writes JUnit XML for downstream steps
       # - Exits non-zero if any test fails → pipeline fails automatically
       - name: Run tests
-        run: pnpm run test -- --reporter=default --reporter=junit --outputFile=reports/results.xml
+        run: pnpm exec vitest run -- --reporter=default --reporter=junit --outputFile=reports/results.xml
 
       # 🔍 DEBUG: Check if the XML file was actually written and where
       - name: Debug - List report files
