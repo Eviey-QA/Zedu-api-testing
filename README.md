@@ -3,9 +3,6 @@
 Automated test suite for the [Zedu](https://zedu.chat/) staging API.  
 **Base URL:** `https://api.staging.zedu.chat/api/v1`
 
-> A Python (Pytest) version of this suite also exists in the sibling `zedu_api_tests/` directory.  
-> Both suites cover the same endpoints with the same test coverage criteria.
-
 ---
 
 ## Table of Contents
@@ -98,8 +95,6 @@ Edit `.env`:
 
 ```env
 APP_BASE_URL=https://api.staging.zedu.chat/api/v1
-TEST_EMAIL=your_account@example.com
-TEST_PASSWORD=YourPassword123!
 ```
 
 > `.env` is listed in `.gitignore` and must **never** be committed to Git.
@@ -131,27 +126,25 @@ npm run test:report
 | Variable       | Required | Description                                   |
 |----------------|----------|-----------------------------------------------|
 | `APP_BASE_URL` | Yes      | API base URL                                  |
-| `TEST_EMAIL`   | Yes      | Pre-existing account email (for env fixture)  |
-| `TEST_PASSWORD`| Yes      | Pre-existing account password                 |
 
 ---
 
 ## Test File Descriptions
 
-### `tests/auth.test.js` (106 tests)
+### `tests/auth.test.js` (106 assertions)
 Comprehensive coverage for `/auth/register`, `/auth/login`, `/auth/logout`, and password management.
 - **Registration**: Validates the new nested response structure (`data.user`), unique field constraints, and field validation.
 - **Login**: Token extraction from nested payloads and credential validation.
 - **Logout**: Token invalidation and secure session termination.
 - **Password Management**: Changing password and ensuring new credentials work immediately.
 
-### `tests/users.test.js` (46 tests)
+### `tests/users.test.js` (46 assertions)
 Covers user-specific endpoints like `GET /users/me` and status updates.
 - **Profile Access**: Validates schema and value consistency for authenticated users.
 - **Status Updates**: Tests for emoji validation and robustness against empty payloads.
 - **User Deletion**: Ensures users can be deleted securely and correctly.
 
-### `tests/roles.test.js` (43 tests)
+### `tests/roles.test.js` (43 assertions)
 Covers organisation role management.
 - **Role Creation**: Validates unique names, descriptions, and organisation constraints.
 - **Negative Testing**: Rejects numeric-only names or duplicate roles.
