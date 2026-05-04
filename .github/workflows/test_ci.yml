@@ -33,9 +33,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Create reports directory
+        run: mkdir -p reports
+
       # ✅ Run full test suite
       # - "default" reporter → console output visible in CI logs
-      # - "junit" reporter   → writes JUnit XML for downstream steps
+      # - "junit" reporter → writes JUnit XML for downstream steps
       # - Exits non-zero if any test fails → pipeline fails automatically
       - name: Run tests
         run: pnpm run test -- --reporter=default --reporter=junit --outputFile=reports/results.xml
