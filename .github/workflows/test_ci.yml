@@ -8,6 +8,7 @@ on:
 
 env:
   APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 
 permissions:
