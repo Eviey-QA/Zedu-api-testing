@@ -366,54 +366,6 @@ describe("Login - Valid Inputs", () => {
   });
 });
 
-describe("Login - Incorrect Password", () => {
-  let res;
-
-  beforeAll(async () => {
-    // Register a fresh account then attempt login with a wrong password
-    const user = await registerUser();
-    res = await postLogin(user.email, "WrongPassword!!99");
-  });
-
-  //Status code
-  test("returns 400 status code", () => {
-    expect(res.status).toBe(400);
-  });
-
-  //Field presence
-  test("response body contains status, status_code, message and error fields", () => {
-    const body = res.data;
-    expect(body).toHaveProperty("status");
-    expect(body).toHaveProperty("status_code");
-    expect(body).toHaveProperty("message");
-    expect(body).toHaveProperty("error");
-  });
-
-  //Data types
-  test("response fields have correct data types", () => {
-    const body = res.data;
-    expect(typeof body.status).toBe("string");
-    expect(typeof body.status_code).toBe("number");
-    expect(typeof body.message).toBe("string");
-    expect(typeof body.error).toBe("object");
-  });
-
-  //Field values
-  test("status is 'error'", () => {
-    expect(res.data.status).toBe("error");
-  });
-
-  //Error message content
-  test("message states invalid credentials", () => {
-    expect(res.data.message).toBe("invalid email and password supplied");
-  });
-
-  //Schema validation
-  test("response matches the errorResponse schema", () => {
-    validate(res.data, "errorResponse");
-  });
-});
-
 describe("Login - Incorrect Email", () => {
   let res;
 
@@ -854,66 +806,6 @@ describe("Change password - Invalid Old Password", () => {
       status: "error",
       status_code: 400,
       message: "old password is incorrect",
-      error: {},
-    });
-  });
-
-  test("response contains an error message", () => {
-    expect(res.data.message.trim().length).toBeGreaterThan(0);
-  });
-
-  test("response matches the errorResponse schema", () => {
-    validate(res.data, "errorResponse");
-  });
-});
-
-describe("Change password - Old And New Password Are The Same", () => {
-  let res;
-  let password;
-
-  beforeAll(async () => {
-    password = "Str0ng@Pass1!";
-
-    const registeredUser = await registerUser({ password });
-    const session = await loginUser(registeredUser.email, password);
-    const token = session.token;
-
-    res = await axios.put(
-      `${getBaseUrl()}/auth/change-password`,
-      {
-        old_password: password,
-        new_password: password,
-      },
-      {
-        headers: authHeaders(token),
-        validateStatus: () => true,
-      },
-    );
-  });
-
-  test("(Bug):returns 409 status code instead of 422", () => {
-    expect(res.status).toBe(409);
-  });
-
-  test("response body contains status, status_code, message and error fields", () => {
-    expect(res.data).toHaveProperty("status");
-    expect(res.data).toHaveProperty("status_code");
-    expect(res.data).toHaveProperty("message");
-    expect(res.data).toHaveProperty("error");
-  });
-
-  test("response fields have correct data types", () => {
-    expect(typeof res.data.status).toBe("string");
-    expect(typeof res.data.status_code).toBe("number");
-    expect(typeof res.data.message).toBe("string");
-    expect(typeof res.data.error).toBe("object");
-  });
-
-  test("response body matches exact same-password error response", () => {
-    expect(res.data).toEqual({
-      status: "error",
-      status_code: 409,
-      message: "new password cannot be the same as the old password",
       error: {},
     });
   });

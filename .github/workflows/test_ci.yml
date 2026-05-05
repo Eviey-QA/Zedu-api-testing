@@ -43,16 +43,6 @@ jobs:
       - name: Run tests
         run: pnpm exec vitest run --reporter=default --reporter=junit --outputFile.junit=reports/results.xml
 
-      # 🔍 DEBUG: Check if the XML file was actually written and where
-      - name: Debug - List report files
-        if: always()
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "--- Searching for any XML files ---"
-          find . -name "*.xml" 2>/dev/null
-          echo "--- Contents of reports/ directory ---"
-          ls -la reports/ 2>/dev/null || echo "reports/ directory does not exist"
-
       # ✅ BONUS: Test summary — renders a pass/fail table in the GitHub Actions UI
       - name: Publish test summary
         uses: mikepenz/action-junit-report@v4

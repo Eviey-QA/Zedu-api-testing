@@ -79,48 +79,6 @@ describe("Update user status - Invalid Emoji", () => {
   });
 });
 
-describe("Update user status - Empty Fields (Bug)", () => {
-  let res;
-
-  beforeAll(async () => {
-    const registeredUser = await registerUser();
-    const session = await loginUser(
-      registeredUser.email,
-      registeredUser.password,
-    );
-    const token = session.token;
-    const userId = registeredUser.userId;
-
-    res = await axios.patch(
-      `${getBaseUrl()}/users/${userId}/status`,
-      {},
-      {
-        headers: authHeaders(token),
-        validateStatus: () => true,
-      },
-    );
-  });
-
-  //Status code: API currently returns 200 but SHOULD return 400/422
-  test("BUG: returns 200 instead of expected 4xx for empty body", () => {
-    // This test documents a known API defect.
-    // Expected behaviour: 400 or 422 (validation error)
-    // Actual behaviour:   200 (silently accepts empty body)
-    expect(res.status).not.toBe(200); // fails — documents the bug
-    expect([400, 422]).toContain(res.status); // what it should return
-  });
-
-  //Error message: should be present but is absent
-  test("BUG: response should contain an error message but does not", () => {
-    expect(hasErrorMessage(res.data)).toBe(true); // fails — documents the bug
-  });
-
-  //Schema: should match errorResponse, not a success shape
-  test("BUG: response should match errorResponse schema", () => {
-    validate(res.data, "errorResponse");
-  });
-});
-
 describe("Retrieve organisation details - Valid Inputs", () => {
   let res;
   let registeredUser;

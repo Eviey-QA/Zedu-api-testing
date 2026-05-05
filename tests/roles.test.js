@@ -405,69 +405,6 @@ describe("Create organisation role - Long Description Field", () => {
     });
 });
 
-// describe("Create organisation role - Numeric Name Field", () => {
-//     let res;
-//     let roleName;
-//     let roleDescription;
-//
-//     beforeAll(async () => {
-//         const registeredUser = await registerUser();
-//         const session = await loginUser(registeredUser.email, registeredUser.password);
-//         const token = session.token;
-//         const orgId = registeredUser.raw.data.user.organisation.id;
-//
-//         roleName = faker.string.numeric(7);
-//         roleDescription = `${faker.word.words(3)} ${faker.string.uuid()}`.slice(0, 40);
-//
-//         res = await axios.post(
-//             `${getBaseUrl()}/organisations/${orgId}/roles`,
-//             {
-//                 name: roleName,
-//                 description: roleDescription,
-//             },
-//             {
-//                 headers: authHeaders(token),
-//                 validateStatus: () => true,
-//             }
-//         );
-//     });
-//
-//     test("BUG: should return 422 status code for numeric-only role name", () => {
-//         expect(res.status).toBe(422);
-//     });
-//
-//     test("BUG: response should contain validation error fields", () => {
-//         expect(res.data).toHaveProperty("status");
-//         expect(res.data).toHaveProperty("status_code");
-//         expect(res.data).toHaveProperty("message");
-//         expect(res.data).toHaveProperty("error");
-//         expect(res.data.error).toHaveProperty("OrgRole.name");
-//     });
-//
-//     test("BUG: validation error response fields should have correct data types", () => {
-//         expect(typeof res.data.status).toBe("string");
-//         expect(typeof res.data.status_code).toBe("number");
-//         expect(typeof res.data.message).toBe("string");
-//         expect(typeof res.data.error).toBe("object");
-//         expect(typeof res.data.error["OrgRole.name"]).toBe("string");
-//     });
-//
-//     test("BUG: response should reject numeric-only role name with validation message", () => {
-//         expect(res.data.status).toBe("error");
-//         expect(res.data.status_code).toBe(422);
-//         expect(res.data.message).toBe("Validation failed");
-//         expect(res.data.error["OrgRole.name"]).toBe("name must contain letters");
-//     });
-//
-//     test("BUG: response should contain an error message", () => {
-//         expect(hasErrorMessage(res.data)).toBe(true);
-//     });
-//
-//     test("response matches the errorResponse schema", () => {
-//         validate(res.data, "errorResponse");
-//     });
-// });
-
 describe("Create organisation role - Invalid Organisation ID", () => {
     let res;
     let roleName;
