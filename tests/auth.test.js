@@ -643,7 +643,7 @@ describe("Change password - Valid Inputs", () => {
   let newPassword;
 
   beforeAll(async () => {
-    oldPassword = "Str0ng@Pass1!";
+    oldPassword = faker.internet.password();
     newPassword = `New@Pass${faker.string.numeric(6)}!`;
 
     registeredUser = await registerUser({ password: oldPassword });
@@ -762,7 +762,7 @@ describe("Change password - Invalid Old Password", () => {
   let newPassword;
 
   beforeAll(async () => {
-    const currentPassword = "Str0ng@Pass1!";
+    const currentPassword = faker.internet.password();
     wrongOldPassword = `Wrong@Pass${faker.string.numeric(6)}!`;
     newPassword = `New@Pass${faker.string.numeric(6)}!`;
 
@@ -822,9 +822,11 @@ describe("Change password - Invalid Old Password", () => {
 describe("Change password - New Password Is One Character", () => {
   let res;
   let oldPassword;
+  let singleCharacter;
 
   beforeAll(async () => {
-    oldPassword = "Str0ng@Pass1!";
+    oldPassword = faker.internet.password();
+    singleCharacter = faker.string.alpha({ length: 1 });
 
     const registeredUser = await registerUser({ password: oldPassword });
     const session = await loginUser(registeredUser.email, oldPassword);
@@ -834,7 +836,7 @@ describe("Change password - New Password Is One Character", () => {
       `${getBaseUrl()}/auth/change-password`,
       {
         old_password: oldPassword,
-        new_password: "1",
+        new_password: singleCharacter,
       },
       {
         headers: authHeaders(token),
@@ -893,7 +895,7 @@ describe("Change password - Empty New Password Field", () => {
   let oldPassword;
 
   beforeAll(async () => {
-    oldPassword = "Str0ng@Pass1!";
+    oldPassword = faker.internet.password();
 
     const registeredUser = await registerUser({ password: oldPassword });
     const session = await loginUser(registeredUser.email, oldPassword);
@@ -963,7 +965,7 @@ describe("Change password - Without Access Token", () => {
   let newPassword;
 
   beforeAll(async () => {
-    oldPassword = "Str0ng@Pass1!";
+    oldPassword = faker.internet.password();
     newPassword = `New@Pass${faker.string.numeric(6)}!`;
 
     res = await axios.put(

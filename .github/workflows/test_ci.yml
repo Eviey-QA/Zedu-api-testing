@@ -29,21 +29,18 @@ jobs:
           node-version: 20
           cache: "pnpm"
 
-      # ✅ Automatically install dependencies
+      #   Automatically install dependencies
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Create reports directory
         run: mkdir -p reports
 
-      # ✅ Run full test suite
-      # - "default" reporter → console output visible in CI logs
-      # - "junit" reporter → writes JUnit XML for downstream steps
-      # - Exits non-zero if any test fails → pipeline fails automatically
+      #   Run full test suite
       - name: Run tests
         run: pnpm exec vitest run --reporter=default --reporter=junit --outputFile.junit=reports/results.xml
 
-      # ✅ BONUS: Test summary — renders a pass/fail table in the GitHub Actions UI
+      #  Test summary renders a pass/fail table in the GitHub Actions UI
       - name: Publish test summary
         uses: mikepenz/action-junit-report@v4
         if: always()
@@ -52,7 +49,7 @@ jobs:
           fail_on_failure: true
           require_tests: true
 
-      # ✅ BONUS: Artifact upload — downloadable XML report from every run
+      #  Artifact upload — downloadable XML report from every run
       - name: Upload test report artifact
         uses: actions/upload-artifact@v4
         if: always()

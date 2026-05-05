@@ -78,6 +78,18 @@ const USER_PROFILE_SCHEMA = {
 // Error response envelope
 const ERROR_RESPONSE_SCHEMA = {
   type: "object",
+  required: ["status", "status_code", "message"],
+  properties: {
+    status: { type: "string" },
+    status_code: { type: "integer" },
+    message: { type: "string" },
+    error: {
+      oneOf: [
+        { type: "object", additionalProperties: true },
+        { type: "string" },
+      ],
+    },
+  },
   additionalProperties: true,
 };
 
@@ -135,7 +147,7 @@ function validateLoginBody(body) {
   return token;
 }
 
-const ERROR_KEYS = ["error", "errors", "msg"];
+const ERROR_KEYS = ["error"];
 
 function hasErrorMessage(body) {
   return ERROR_KEYS.some((k) => body[k] !== undefined);

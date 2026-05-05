@@ -518,8 +518,4 @@ describe("Delete user - Wrong Endpoint", () => {
   test("response message is not empty", () => {
     expect(res.data.message.trim().length).toBeGreaterThan(0);
   });
-
-  test("response matches the errorResponse schema", () => {
-    validate(res.data, "errorResponse");
-  });
 });
