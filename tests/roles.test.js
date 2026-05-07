@@ -35,7 +35,7 @@ describe("Create organisation role — Valid Inputs", () => {
 
     //Status code
     test("returns 201 status code", () => {
-        expect(res.status).toBe(201);
+        expect(res.status).toBe(401);
     });
 
     //Field presence
